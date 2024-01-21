@@ -13,7 +13,8 @@ MorseCode = {'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..
              'Ч': '---.', 'Ш': '----', 'Щ': '--.-', 'Ъ': '--.--', 'Ы': '-.--', 'Ь': '-..-', 'Э': '..-..',
              'Ю': '..--', 'Я': '.-.-',
              }
-
+words = ''  # текст который надо кодировать/декодировать
+kol = 0  # 1 - кодировать, 2 - декодировать
 
 def encode_to_morse(text):
     global MorseCode
@@ -42,4 +43,61 @@ def decode_from_morse(code):
 
 
 def main():
+    import tkinter
+    def show_key(event):
+        global words, kol, f
+        if kol == 0:
+            label.config(text="Введите 1 для кодировки текста, 2 для декодировки")
+            kol = int(event.char)
+            words = str(event.char)
+            words += '\n'
+            label.config(text=words + 'Введите текст. Для перевода нажмите клавишу Enter')
+            words = ''
+        elif kol == 1:
+            if str(event.keysym) == 'Return':
+                words += '\n'
+                if kol == 1:
+                    label.config(text=encode_to_morse(words))
+                else:  # kol == 2
+                    label.config(text=decode_from_morse(words))
+                kol = 0
+            elif str(event.char).upper() in MorseCode.keys():
+                words += str(event.char)
+                label.config(text=words)
+            else:
+                label.config(text=words + '\nОшибка! Вы ввели символ, который не отображается, или его нет в азбуке Морзе')
+        elif kol == 2:
+            if str(event.keysym) == 'Return':
+                words += '\n'
+                if kol == 1:
+                    label.config(text=encode_to_morse(words))
+                else:  # kol == 2
+                    label.config(text=decode_from_morse(words))
+                kol = 0
+            elif str(event.keysym) == '.' or str(event.keysym) == '-':
+                words += str(event.char)
+                label.config(text=words)
+            else:
+                label.config(text=words + '\nОшибка! Вы ввели символ, который не отображается, или его нет в азбуке Морзе')
+        else:
+            if kol == 1:
+                label.config(text=encode_to_morse(words))
+            else: # kol == 2
+                label.config(text=decode_from_morse(words))
+            kol = 0
+
+    master = tkinter.Tk()
+    master.title('Кодировка сообщений по азбуке Морзе')
+    master.geometry('600x600')
+    master.resizable(width=False, height=False)
+
+    label = tkinter.Label(master, text="Введите 1 для кодировки текста, 2 для декодировки")
+    label.pack()
+
+    master.bind("<KeyPress>", show_key)
+    master.mainloop()
+
+
 # Здесь должно открываться графическое окно и обрабатываться ввод пользователя
+
+main()
