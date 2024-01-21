@@ -1,0 +1,114 @@
+MorseCode = [{'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+              'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+              'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+              'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+              'Y': '-.--', 'Z': '--..', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+              '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.', '0': '-----',
+              '.': '......', ',': '.-.-.-', ':': '---...', ';': '-.-.-.', '(': '-.--.-', ')': '-.--.-',
+              '\'': '.----.', '\"': '.-..-.', '-': '-....-', '/': '-..-.', '?': '..--..', '!': '--..--',
+              '+': '.-.-.', '@': '.--.-.'},
+             {'А': '.-', 'Б': '-...', 'В': '.--', 'Г': '--.', 'Д': '-..', 'Е': '.', 'Ё': '.', 'Ж': '...-',
+              'З': '--..', 'И': '..', 'Й': '.---', 'К': '-.-', 'Л': '.-..', 'М': '--', 'Н': '-.', 'О': '---',
+              'П': '.--.', 'Р': '.-.', 'С': '...', 'Т': '-', 'У': '..-', 'Ф': '..-.', 'Х': '....', 'Ц': '-.-.',
+              'Ч': '---.', 'Ш': '----', 'Щ': '--.-', 'Ъ': '--.--', 'Ы': '-.--', 'Ь': '-..-', 'Э': '..-..',
+              'Ю': '..--', 'Я': '.-.-',
+              '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+              '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.', '0': '-----',
+              '.': '......', ',': '.-.-.-', ':': '---...', ';': '-.-.-.', '(': '-.--.-', ')': '-.--.-',
+              '\'': '.----.', '\"': '.-..-.', '-': '-....-', '/': '-..-.', '?': '..--..', '!': '--..--',
+              '+': '.-.-.', '@': '.--.-.'
+              }]
+words = ''  # текст который надо кодировать/декодировать
+kol = 0  # 1 - кодировать, 2 - декодировать
+
+def encode_to_morse(text, lang):    # lang 0 - английский, lang 1 - русский
+    global MorseCode
+    if lang == 0 or lang == 1:
+        text = text.upper().split()
+        res = []
+        for string in text:
+            podres = []
+            for let in string:
+                podres.append(MorseCode[lang][let])
+            res.append(' '.join(podres))
+        return '\n'.join(res)
+    else:
+        return 'Невозможно закодировать сообщение!'
+
+
+def decode_from_morse(code, lang):   # lang == 0 - английский, lang == 1 - русский
+    global MorseCode
+    if lang == 0 or lang == 1:
+        text = ''
+        codes = [c.split() for c in code.split('\n')]
+        for word in codes:
+            for let in word:
+                for k in MorseCode.keys():
+                    if MorseCode[lang][k] == let:
+                        text += k
+                        break
+            text += ' '
+        return text
+    else:
+        return 'Невозможно декодировать сообщение!'
+
+
+def main():
+    import tkinter
+    def show_key(event):
+        global words, kol, f
+        if kol == 0:
+            label.config(text="Введите 1 для кодировки текста, 2 для декодировки")
+            kol = int(event.char)
+            words = str(event.char)
+            words += '\n'
+            label.config(text=words + 'Введите текст. Для перевода нажмите клавишу Enter')
+            words = ''
+        elif kol == 1:
+            if str(event.keysym) == 'Return':
+                words += '\n'
+                if kol == 1:
+                    label.config(text=encode_to_morse(words))
+                else:  # kol == 2
+                    label.config(text=decode_from_morse(words))
+                kol = 0
+            elif str(event.char).upper() in MorseCode.keys():
+                words += str(event.char)
+                label.config(text=words)
+            else:
+                label.config(text=words + '\nОшибка! Вы ввели символ, который не отображается, или его нет в азбуке Морзе')
+        elif kol == 2:
+            if str(event.keysym) == 'Return':
+                words += '\n'
+                if kol == 1:
+                    label.config(text=encode_to_morse(words))
+                else:  # kol == 2
+                    label.config(text=decode_from_morse(words))
+                kol = 0
+            elif str(event.keysym) == '.' or str(event.keysym) == '-':
+                words += str(event.char)
+                label.config(text=words)
+            else:
+                label.config(text=words + '\nОшибка! Вы ввели символ, который не отображается, или его нет в азбуке Морзе')
+        else:
+            if kol == 1:
+                label.config(text=encode_to_morse(words))
+            else: # kol == 2
+                label.config(text=decode_from_morse(words))
+            kol = 0
+
+    master = tkinter.Tk()
+    master.title('Кодировка сообщений по азбуке Морзе')
+    master.geometry('600x600')
+    master.resizable(width=False, height=False)
+
+    label = tkinter.Label(master, text="Введите 1 для кодировки текста, 2 для декодировки")
+    label.pack()
+
+    master.bind("<KeyPress>", show_key)
+    master.mainloop()
+
+
+# Здесь должно открываться графическое окно и обрабатываться ввод пользователя
+
+main()
